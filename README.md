@@ -97,7 +97,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ### Currently supported Boards
 
-1. **nRF52_MBED-based boards** such as Nano-33-BLE or Nano-33-BLE_Sense, etc., using [`Arduino mbed_nano core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed)
+1. **nRF52_MBED-based boards** such as Nano-33-BLE or Nano-33-BLE_Sense, etc., using [`Arduino mbed_nano core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2)
 
 ---
 
@@ -114,7 +114,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
  1. [`Arduino IDE 1.8.16+` for Arduino](https://www.arduino.cc/en/Main/Software)
  2. [`Arduino mbed_nano core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed) for NRF52-based board using mbed-RTOS such as Nano-33-BLE if you don't use `NRF_TIMER_1`. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
- 3. [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed) for NRF52-based board using mbed-RTOS such as Nano-33-BLE if you'd like to use `NRF_TIMER_1`. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
+ 3. [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2) for NRF52-based board using mbed-RTOS such as Nano-33-BLE if you'd like to use `NRF_TIMER_1`. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
  
  4. To use with certain example
    - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_16_PWMs_Array_Complex example](examples/ISR_16_PWMs_Array_Complex).
@@ -177,7 +177,7 @@ To re-use the **new h-only** way, just
 
 For [`Arduino mbed_nano core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed), you can only select NRF52 Hardware Timer NRF_TIMER_3-NRF_TIMER_4 (3 to 4). If you select the already-used NRF_TIMER_0-2, it'll be auto modified to use NRF_TIMER_3
 
-For [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed), you can only select NRF52 Hardware Timer NRF_TIMER_1, NRF_TIMER_3-NRF_TIMER_4 (1, 3 and 4). But for the sake of compatibility, if you select the NRF_TIMER_0-2, it'll be auto modified to use NRF_TIMER_3
+For [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2), you can only select NRF52 Hardware Timer NRF_TIMER_1, NRF_TIMER_3-NRF_TIMER_4 (1, 3 and 4). But for the sake of compatibility, if you select the NRF_TIMER_0-2, it'll be auto modified to use NRF_TIMER_3
 
 Before using any Timer, you have to make sure the Timer has not been used by any other purpose.
 
@@ -982,7 +982,7 @@ Submit issues to: [nRF52_MBED_Slow_PWM issues](https://github.com/khoih-prog/nRF
 
 ## DONE
 
-1. Basic hardware multi-channel PWM for **nRF52_MBED-based Nano-33-BLE or Nano-33-BLE_Sense, etc.** using [`Arduino mbed_nano core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed)
+1. Basic hardware multi-channel PWM for **nRF52_MBED-based Nano-33-BLE or Nano-33-BLE_Sense, etc.** using [`Arduino mbed_nano core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2)
 2. Add Table of Contents
 
 ---
