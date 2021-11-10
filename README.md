@@ -947,9 +947,9 @@ Channel : 15	Period : 20000		OnTime : 19000	Start_Time : 2783199
 
 ---
 
-### 4. ISR_Modify_PWM on PORTENTA_H7_M7
+### 4. ISR_Modify_PWM on Nano 33 BLE
 
-The following is the sample terminal output when running example [ISR_Modify_PWM](examples/ISR_Modify_PWM) on **Nano 33 BLE** to demonstrate how to modify PWM settings on-the-fly without deleting the PWM channel
+The following is the sample terminal output when running example [ISR_Modify_PWM](examples/ISR_Modify_PWM) on **nRF52_MBED-based Nano 33 BLE** to demonstrate how to modify PWM settings on-the-fly without deleting the PWM channel
 
 ```
 Starting ISR_Modify_PWM on Nano 33 BLE
@@ -966,9 +966,9 @@ Channel : 0	Period : 500000		OnTime : 450000	Start_Time : 33630621
 
 ---
 
-### 5. ISR_Changing_PWM on PORTENTA_H7_M7
+### 5. ISR_Changing_PWM on Nano 33 BLE
 
-The following is the sample terminal output when running example [ISR_Changing_PWM](examples/ISR_Changing_PWM) on **Nano 33 BLE** to demonstrate how to modify PWM settings on-the-fly by deleting the PWM channel and reinit the PWM channel
+The following is the sample terminal output when running example [ISR_Changing_PWM](examples/ISR_Changing_PWM) on **nRF52_MBED-based Nano 33 BLE** to demonstrate how to modify PWM settings on-the-fly by deleting the PWM channel and reinit the PWM channel
 
 ```
 Starting ISR_Changing_PWM on Nano 33 BLE
