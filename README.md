@@ -13,6 +13,7 @@
 
 ## Table of Contents
 
+* [Important Change from v1.2.0](#Important-Change-from-v120)
 * [Why do we need this nRF52_MBED_Slow_PWM library](#why-do-we-need-this-nRF52_MBED_Slow_PWM-library)
   * [Features](#features)
   * [Why using ISR-based PWM is better](#why-using-isr-based-pwm-is-better)
@@ -34,6 +35,7 @@
   * [ 3. ISR_16_PWMs_Array_Simple](examples/ISR_16_PWMs_Array_Simple)
   * [ 4. ISR_Changing_PWM](examples/ISR_Changing_PWM)
   * [ 5. ISR_Modify_PWM](examples/ISR_Modify_PWM)
+  * [ 6. multiFileProject](examples/multiFileProject). **New**
 * [Example ISR_16_PWMs_Array_Complex](#Example-ISR_16_PWMs_Array_Complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. ISR_16_PWMs_Array_Complex on Nano 33 BLE](#1-ISR_16_PWMs_Array_Complex-on-Nano-33-BLE)
@@ -50,6 +52,23 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Copyright](#copyright)
+
+---
+---
+
+### Important Change from v1.2.0
+
+Please have a look at [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix-multiple-definitions-linker-error)
+
+As more complex calculation and check **inside ISR** are introduced from v1.2.0, there is possibly some crash depending on use-case.
+
+You can modify to use larger `HW_TIMER_INTERVAL_US`, (from current 10uS), according to your board and use-case if crash happens.
+
+
+```
+// Don't change these numbers to make higher Timer freq. System can hang
+#define HW_TIMER_INTERVAL_US      10L
+```
 
 ---
 ---
@@ -156,24 +175,25 @@ Another way to install is to:
 
 ### HOWTO Fix `Multiple Definitions` Linker Error
 
-The current library implementation, using **xyz-Impl.h instead of standard xyz.cpp**, possibly creates certain `Multiple Definitions` Linker error in certain use cases. Although it's simple to just modify several lines of code, either in the library or in the application, the library is adding 2 more source directories
+The current library implementation, using `xyz-Impl.h` instead of standard `xyz.cpp`, possibly creates certain `Multiple Definitions` Linker error in certain use cases.
 
-1. **scr_h** for new h-only files
-2. **src_cpp** for standard h/cpp files
+You can include this `.hpp` file
 
-besides the standard **src** directory.
+```
+// Can be included as many times as necessary, without `Multiple Definitions` Linker Error
+#include "nRF52_MBED_Slow_PWM.hpp"    //https://github.com/khoih-prog/nRF52_MBED_Slow_PWM
+```
 
-To use the **old standard cpp** way, locate this library' directory, then just 
+in many files. But be sure to use the following `.h` file **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-1. **Delete the all the files in src directory.**
-2. **Copy all the files in src_cpp directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+```
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include "nRF52_MBED_Slow_PWM.h"      //https://github.com/khoih-prog/nRF52_MBED_Slow_PWM
+```
 
-To re-use the **new h-only** way, just 
+Check the new [**multiFileProject** example](examples/multiFileProject) for a `HOWTO` demo.
 
-1. **Delete the all the files in src directory.**
-2. **Copy the files in src_h directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+Have a look at the discussion in [Different behaviour using the src_cpp or src_h lib #80](https://github.com/khoih-prog/ESPAsync_WiFiManager/discussions/80)
 
 ---
 ---
@@ -232,6 +252,7 @@ void setup()
  3. [ISR_16_PWMs_Array_Simple](examples/ISR_16_PWMs_Array_Simple)
  4. [ISR_Changing_PWM](examples/ISR_Changing_PWM)
  5. [ISR_Modify_PWM](examples/ISR_Modify_PWM)
+ 6. [**multiFileProject**](examples/multiFileProject) **New**
 
  
 ---
@@ -327,12 +348,12 @@ typedef struct
   irqCallback   irqCallbackStopFunc;
 
 #if USING_PWM_FREQUENCY  
-  uint32_t      PWM_Freq;
+  float         PWM_Freq;
 #else  
   uint32_t      PWM_Period;
 #endif
   
-  uint32_t      PWM_DutyCycle;
+  float         PWM_DutyCycle;
   
   uint64_t      deltaMicrosStart;
   uint64_t      previousMicrosStart;
@@ -352,39 +373,40 @@ void doingSomethingStop(int index);
 
 #else   // #if USE_COMPLEX_STRUCT
 
-volatile unsigned long deltaMicrosStart    [NUMBER_ISR_PWMS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-volatile unsigned long previousMicrosStart [NUMBER_ISR_PWMS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+volatile unsigned long deltaMicrosStart    [] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+volatile unsigned long previousMicrosStart [] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-volatile unsigned long deltaMicrosStop     [NUMBER_ISR_PWMS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-volatile unsigned long previousMicrosStop  [NUMBER_ISR_PWMS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+volatile unsigned long deltaMicrosStop     [] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+volatile unsigned long previousMicrosStop  [] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // You can assign pins here. Be carefull to select good pin to use or crash, e.g pin 6-11
-uint32_t PWM_Pin[NUMBER_ISR_PWMS] =
+uint32_t PWM_Pin[] =
 {
    LED_BUILTIN, LED_BLUE, LED_RED, PIN_D0, PIN_D1,  PIN_D2,  PIN_D3,  PIN_D4,
         PIN_D5,   PIN_D6,  PIN_D7, PIN_D8, PIN_D9, PIN_D10, PIN_D11, PIN_D12
 };
 
 // You can assign any interval for any timer here, in microseconds
-uint32_t PWM_Period[NUMBER_ISR_PWMS] =
+uint32_t PWM_Period[] =
 {
   1000000L,   500000L,   333333L,   250000L,   200000L,   166667L,   142857L,   125000L,
    111111L,   100000L,    66667L,    50000L,    40000L,   33333L,     25000L,    20000L
 };
 
 // You can assign any interval for any timer here, in Hz
-double PWM_Freq[NUMBER_ISR_PWMS] =
+float PWM_Freq[] =
 {
   1.0f,  2.0f,  3.0f,  4.0f,  5.0f,  6.0f,  7.0f,  8.0f,
   9.0f, 10.0f, 15.0f, 20.0f, 25.0f, 30.0f, 40.0f, 50.0f
 };
 
 // You can assign any interval for any timer here, in milliseconds
-uint32_t PWM_DutyCycle[NUMBER_ISR_PWMS] =
+float PWM_DutyCycle[] =
 {
-   5, 10, 20, 30, 40, 45, 50, 55,
-  60, 65, 70, 75, 80, 85, 90, 95
+   5.0, 10.0, 20.0, 30.0, 40.0, 45.0, 50.0, 55.0,
+  60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0
 };
+
 
 void doingSomethingStart(int index)
 {
@@ -577,7 +599,7 @@ void doingSomethingStop15()
 
   #if USING_PWM_FREQUENCY
   
-  ISR_PWM_Data curISR_PWM_Data[NUMBER_ISR_PWMS] =
+  ISR_PWM_Data curISR_PWM_Data[] =
   {
     // pin, irqCallbackStartFunc, irqCallbackStopFunc, PWM_Freq, PWM_DutyCycle, deltaMicrosStart, previousMicrosStart, deltaMicrosStop, previousMicrosStop
     { LED_BUILTIN,  doingSomethingStart0,    doingSomethingStop0,    1,   5, 0, 0, 0, 0 },
@@ -600,7 +622,7 @@ void doingSomethingStop15()
   
   #else   // #if USING_PWM_FREQUENCY
   
-  ISR_PWM_Data curISR_PWM_Data[NUMBER_ISR_PWMS] =
+  ISR_PWM_Data curISR_PWM_Data[] =
   {
     // pin, irqCallbackStartFunc, irqCallbackStopFunc, PWM_Period, PWM_DutyCycle, deltaMicrosStart, previousMicrosStart, deltaMicrosStop, previousMicrosStop
     { LED_BUILTIN,  doingSomethingStart0,     doingSomethingStop0,   1000000L,  5, 0, 0, 0, 0 },
@@ -643,7 +665,7 @@ void doingSomethingStop(int index)
 
 #else   // #if USE_COMPLEX_STRUCT
 
-irqCallback irqCallbackStartFunc[NUMBER_ISR_PWMS] =
+irqCallback irqCallbackStartFunc[] =
 {
   doingSomethingStart0,  doingSomethingStart1,  doingSomethingStart2,  doingSomethingStart3,
   doingSomethingStart4,  doingSomethingStart5,  doingSomethingStart6,  doingSomethingStart7,
@@ -651,7 +673,7 @@ irqCallback irqCallbackStartFunc[NUMBER_ISR_PWMS] =
   doingSomethingStart12, doingSomethingStart13, doingSomethingStart14, doingSomethingStart15
 };
 
-irqCallback irqCallbackStopFunc[NUMBER_ISR_PWMS] =
+irqCallback irqCallbackStopFunc[] =
 {
   doingSomethingStop0,  doingSomethingStop1,  doingSomethingStop2,  doingSomethingStop3,
   doingSomethingStop4,  doingSomethingStop5,  doingSomethingStop6,  doingSomethingStop7,
@@ -756,7 +778,7 @@ void setup()
     curISR_PWM_Data[i].previousMicrosStart = startMicros;
     //ISR_PWM.setInterval(curISR_PWM_Data[i].PWM_Period, curISR_PWM_Data[i].irqCallbackStartFunc);
 
-    //void setPWM(uint32_t pin, uint32_t frequency, uint32_t dutycycle
+    //void setPWM(uint32_t pin, float frequency, float dutycycle
     // , timer_callback_p StartCallback = nullptr, timer_callback_p StopCallback = nullptr)
 
   #if USING_PWM_FREQUENCY
@@ -814,77 +836,77 @@ The following is the sample terminal output when running example [ISR_16_PWMs_Ar
 
 ```
 Starting ISR_16_PWMs_Array_Complex on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.1.0
-[PWM] NRF52_MBED_TimerInterrupt: Timer = NRF_TIMER3
-[PWM] Frequency = 16000000.00 , _count = 160
-Starting ITimer OK, micros() = 2703801
-Channel : 0	Period : 1000000		OnTime : 50000	Start_Time : 2705662
-Channel : 1	Period : 500000		OnTime : 50000	Start_Time : 2705662
-Channel : 2	Period : 333333		OnTime : 66666	Start_Time : 2705662
-Channel : 3	Period : 250000		OnTime : 75000	Start_Time : 2705662
-Channel : 4	Period : 200000		OnTime : 80000	Start_Time : 2705662
-Channel : 5	Period : 166666		OnTime : 74999	Start_Time : 2705662
-Channel : 6	Period : 142857		OnTime : 71428	Start_Time : 2705662
-Channel : 7	Period : 125000		OnTime : 68750	Start_Time : 2705662
-Channel : 8	Period : 111111		OnTime : 66666	Start_Time : 2705662
-Channel : 9	Period : 100000		OnTime : 65000	Start_Time : 2705662
-Channel : 10	Period : 66666		OnTime : 46666	Start_Time : 2705662
-Channel : 11	Period : 50000		OnTime : 37500	Start_Time : 2705662
-Channel : 12	Period : 40000		OnTime : 32000	Start_Time : 2705662
-Channel : 13	Period : 33333		OnTime : 28333	Start_Time : 2705662
-Channel : 14	Period : 25000		OnTime : 22500	Start_Time : 2705662
-Channel : 15	Period : 20000		OnTime : 19000	Start_Time : 2705662
-SimpleTimer (ms): 2000, us : 12763937, Dus : 10058301
-PWM Channel : 0, programmed Period (us): 1000000, actual : 1000022, programmed DutyCycle : 5, actual : 5.00
-PWM Channel : 1, programmed Period (us): 500000, actual : 500001, programmed DutyCycle : 10, actual : 9.99
-PWM Channel : 2, programmed Period (us): 333333, actual : 333336, programmed DutyCycle : 20, actual : 19.99
-PWM Channel : 3, programmed Period (us): 250000, actual : 250029, programmed DutyCycle : 30, actual : 29.99
-PWM Channel : 4, programmed Period (us): 200000, actual : 200010, programmed DutyCycle : 40, actual : 39.99
-PWM Channel : 5, programmed Period (us): 166666, actual : 166695, programmed DutyCycle : 45, actual : 44.98
-PWM Channel : 6, programmed Period (us): 142857, actual : 142881, programmed DutyCycle : 50, actual : 49.98
-PWM Channel : 7, programmed Period (us): 125000, actual : 125023, programmed DutyCycle : 55, actual : 54.98
-PWM Channel : 8, programmed Period (us): 111111, actual : 111141, programmed DutyCycle : 60, actual : 59.97
-PWM Channel : 9, programmed Period (us): 100000, actual : 100005, programmed DutyCycle : 65, actual : 64.96
-PWM Channel : 10, programmed Period (us): 66666, actual : 66662, programmed DutyCycle : 70, actual : 69.98
-PWM Channel : 11, programmed Period (us): 50000, actual : 50015, programmed DutyCycle : 75, actual : 74.98
-PWM Channel : 12, programmed Period (us): 40000, actual : 39997, programmed DutyCycle : 80, actual : 79.98
-PWM Channel : 13, programmed Period (us): 33333, actual : 33360, programmed DutyCycle : 85, actual : 84.90
-PWM Channel : 14, programmed Period (us): 25000, actual : 25027, programmed DutyCycle : 90, actual : 89.85
-PWM Channel : 15, programmed Period (us): 20000, actual : 19996, programmed DutyCycle : 95, actual : 94.83
-SimpleTimer (ms): 2000, us : 22840437, Dus : 10076500
-PWM Channel : 0, programmed Period (us): 1000000, actual : 1000000, programmed DutyCycle : 5, actual : 5.00
-PWM Channel : 1, programmed Period (us): 500000, actual : 500031, programmed DutyCycle : 10, actual : 9.99
-PWM Channel : 2, programmed Period (us): 333333, actual : 333361, programmed DutyCycle : 20, actual : 19.99
-PWM Channel : 3, programmed Period (us): 250000, actual : 250020, programmed DutyCycle : 30, actual : 30.00
-PWM Channel : 4, programmed Period (us): 200000, actual : 200009, programmed DutyCycle : 40, actual : 40.00
-PWM Channel : 5, programmed Period (us): 166666, actual : 166678, programmed DutyCycle : 45, actual : 44.98
-PWM Channel : 6, programmed Period (us): 142857, actual : 142868, programmed DutyCycle : 50, actual : 49.99
-PWM Channel : 7, programmed Period (us): 125000, actual : 125006, programmed DutyCycle : 55, actual : 54.97
-PWM Channel : 8, programmed Period (us): 111111, actual : 111118, programmed DutyCycle : 60, actual : 59.97
-PWM Channel : 9, programmed Period (us): 100000, actual : 100014, programmed DutyCycle : 65, actual : 64.98
-PWM Channel : 10, programmed Period (us): 66666, actual : 66686, programmed DutyCycle : 70, actual : 69.95
-PWM Channel : 11, programmed Period (us): 50000, actual : 49997, programmed DutyCycle : 75, actual : 74.95
-PWM Channel : 12, programmed Period (us): 40000, actual : 40006, programmed DutyCycle : 80, actual : 79.96
-PWM Channel : 13, programmed Period (us): 33333, actual : 33341, programmed DutyCycle : 85, actual : 84.96
-PWM Channel : 14, programmed Period (us): 25000, actual : 25017, programmed DutyCycle : 90, actual : 89.93
-PWM Channel : 15, programmed Period (us): 20000, actual : 20024, programmed DutyCycle : 95, actual : 94.78
-SimpleTimer (ms): 2000, us : 32916583, Dus : 10076146
-PWM Channel : 0, programmed Period (us): 1000000, actual : 1000015, programmed DutyCycle : 5, actual : 5.00
-PWM Channel : 1, programmed Period (us): 500000, actual : 500014, programmed DutyCycle : 10, actual : 10.00
-PWM Channel : 2, programmed Period (us): 333333, actual : 333367, programmed DutyCycle : 20, actual : 20.00
-PWM Channel : 3, programmed Period (us): 250000, actual : 250032, programmed DutyCycle : 30, actual : 29.99
-PWM Channel : 4, programmed Period (us): 200000, actual : 200035, programmed DutyCycle : 40, actual : 39.99
-PWM Channel : 5, programmed Period (us): 166666, actual : 166702, programmed DutyCycle : 45, actual : 44.98
-PWM Channel : 6, programmed Period (us): 142857, actual : 142865, programmed DutyCycle : 50, actual : 49.99
-PWM Channel : 7, programmed Period (us): 125000, actual : 125015, programmed DutyCycle : 55, actual : 54.99
-PWM Channel : 8, programmed Period (us): 111111, actual : 111141, programmed DutyCycle : 60, actual : 59.98
-PWM Channel : 9, programmed Period (us): 100000, actual : 100018, programmed DutyCycle : 65, actual : 64.98
-PWM Channel : 10, programmed Period (us): 66666, actual : 66695, programmed DutyCycle : 70, actual : 69.95
-PWM Channel : 11, programmed Period (us): 50000, actual : 49997, programmed DutyCycle : 75, actual : 75.03
-PWM Channel : 12, programmed Period (us): 40000, actual : 40000, programmed DutyCycle : 80, actual : 79.95
-PWM Channel : 13, programmed Period (us): 33333, actual : 33329, programmed DutyCycle : 85, actual : 84.86
-PWM Channel : 14, programmed Period (us): 25000, actual : 25040, programmed DutyCycle : 90, actual : 89.85
-PWM Channel : 15, programmed Period (us): 20000, actual : 20015, programmed DutyCycle : 95, actual : 94.91
+NRF52_MBED_Slow_PWM v1.2.0
+[PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
+[PWM] Frequency =  100000.00 , _count =  160
+Starting ITimer OK, micros() = 2800208
+Channel : 0	    Period : 1000000		OnTime : 50000	Start_Time : 2802391
+Channel : 1	    Period : 500000		OnTime : 50000	Start_Time : 2805669
+Channel : 2	    Period : 333333		OnTime : 66666	Start_Time : 2809019
+Channel : 3	    Period : 250000		OnTime : 75000	Start_Time : 2812245
+Channel : 4	    Period : 200000		OnTime : 80000	Start_Time : 2815525
+Channel : 5	    Period : 166666		OnTime : 74999	Start_Time : 2818972
+Channel : 6	    Period : 142857		OnTime : 71428	Start_Time : 2822317
+Channel : 7	    Period : 125000		OnTime : 68750	Start_Time : 2825720
+Channel : 8	    Period : 111111		OnTime : 66666	Start_Time : 2829165
+Channel : 9	    Period : 100000		OnTime : 65000	Start_Time : 2832514
+Channel : 10	    Period : 66666		OnTime : 46666	Start_Time : 2835951
+Channel : 11	    Period : 50000		OnTime : 37500	Start_Time : 2839484
+Channel : 12	    Period : 40000		OnTime : 32000	Start_Time : 2843002
+Channel : 13	    Period : 33333		OnTime : 28333	Start_Time : 2846504
+Channel : 14	    Period : 25000		OnTime : 22500	Start_Time : 2850118
+Channel : 15	    Period : 20000		OnTime : 19000	Start_Time : 2853663
+SimpleTimer (ms): 2000, us : 12855209, Dus : 10053055
+PWM Channel : 0, programmed Period (us): 1000000.00, actual : 1000016, programmed DutyCycle : 5.00, actual : 5.00
+PWM Channel : 1, programmed Period (us): 500000.00, actual : 500034, programmed DutyCycle : 10.00, actual : 10.00
+PWM Channel : 2, programmed Period (us): 333333.34, actual : 333344, programmed DutyCycle : 20.00, actual : 20.00
+PWM Channel : 3, programmed Period (us): 250000.00, actual : 250023, programmed DutyCycle : 30.00, actual : 29.99
+PWM Channel : 4, programmed Period (us): 200000.00, actual : 200012, programmed DutyCycle : 40.00, actual : 40.00
+PWM Channel : 5, programmed Period (us): 166666.67, actual : 166689, programmed DutyCycle : 45.00, actual : 44.98
+PWM Channel : 6, programmed Period (us): 142857.14, actual : 142882, programmed DutyCycle : 50.00, actual : 49.98
+PWM Channel : 7, programmed Period (us): 125000.00, actual : 125016, programmed DutyCycle : 55.00, actual : 54.97
+PWM Channel : 8, programmed Period (us): 111111.11, actual : 111133, programmed DutyCycle : 60.00, actual : 59.97
+PWM Channel : 9, programmed Period (us): 100000.00, actual : 100009, programmed DutyCycle : 65.00, actual : 64.99
+PWM Channel : 10, programmed Period (us): 66666.66, actual : 66672, programmed DutyCycle : 70.00, actual : 69.95
+PWM Channel : 11, programmed Period (us): 50000.00, actual : 50031, programmed DutyCycle : 75.00, actual : 74.91
+PWM Channel : 12, programmed Period (us): 40000.00, actual : 40005, programmed DutyCycle : 80.00, actual : 79.97
+PWM Channel : 13, programmed Period (us): 33333.33, actual : 33377, programmed DutyCycle : 85.00, actual : 84.88
+PWM Channel : 14, programmed Period (us): 25000.00, actual : 25001, programmed DutyCycle : 90.00, actual : 89.88
+PWM Channel : 15, programmed Period (us): 20000.00, actual : 20003, programmed DutyCycle : 95.00, actual : 94.93
+SimpleTimer (ms): 2000, us : 22957454, Dus : 10102245
+PWM Channel : 0, programmed Period (us): 1000000.00, actual : 1000011, programmed DutyCycle : 5.00, actual : 5.00
+PWM Channel : 1, programmed Period (us): 500000.00, actual : 500024, programmed DutyCycle : 10.00, actual : 9.99
+PWM Channel : 2, programmed Period (us): 333333.34, actual : 333349, programmed DutyCycle : 20.00, actual : 19.99
+PWM Channel : 3, programmed Period (us): 250000.00, actual : 250015, programmed DutyCycle : 30.00, actual : 29.99
+PWM Channel : 4, programmed Period (us): 200000.00, actual : 200028, programmed DutyCycle : 40.00, actual : 39.98
+PWM Channel : 5, programmed Period (us): 166666.67, actual : 166678, programmed DutyCycle : 45.00, actual : 44.98
+PWM Channel : 6, programmed Period (us): 142857.14, actual : 142854, programmed DutyCycle : 50.00, actual : 49.98
+PWM Channel : 7, programmed Period (us): 125000.00, actual : 125008, programmed DutyCycle : 55.00, actual : 54.98
+PWM Channel : 8, programmed Period (us): 111111.11, actual : 111143, programmed DutyCycle : 60.00, actual : 59.95
+PWM Channel : 9, programmed Period (us): 100000.00, actual : 100003, programmed DutyCycle : 65.00, actual : 64.99
+PWM Channel : 10, programmed Period (us): 66666.66, actual : 66676, programmed DutyCycle : 70.00, actual : 69.95
+PWM Channel : 11, programmed Period (us): 50000.00, actual : 50030, programmed DutyCycle : 75.00, actual : 74.89
+PWM Channel : 12, programmed Period (us): 40000.00, actual : 40008, programmed DutyCycle : 80.00, actual : 79.93
+PWM Channel : 13, programmed Period (us): 33333.33, actual : 33375, programmed DutyCycle : 85.00, actual : 84.88
+PWM Channel : 14, programmed Period (us): 25000.00, actual : 25040, programmed DutyCycle : 90.00, actual : 89.82
+PWM Channel : 15, programmed Period (us): 20000.00, actual : 19995, programmed DutyCycle : 95.00, actual : 94.91
+SimpleTimer (ms): 2000, us : 33060835, Dus : 10103381
+PWM Channel : 0, programmed Period (us): 1000000.00, actual : 1000000, programmed DutyCycle : 5.00, actual : 5.00
+PWM Channel : 1, programmed Period (us): 500000.00, actual : 500029, programmed DutyCycle : 10.00, actual : 10.00
+PWM Channel : 2, programmed Period (us): 333333.34, actual : 333354, programmed DutyCycle : 20.00, actual : 19.99
+PWM Channel : 3, programmed Period (us): 250000.00, actual : 249993, programmed DutyCycle : 30.00, actual : 30.00
+PWM Channel : 4, programmed Period (us): 200000.00, actual : 200017, programmed DutyCycle : 40.00, actual : 40.00
+PWM Channel : 5, programmed Period (us): 166666.67, actual : 166676, programmed DutyCycle : 45.00, actual : 45.00
+PWM Channel : 6, programmed Period (us): 142857.14, actual : 142867, programmed DutyCycle : 50.00, actual : 49.98
+PWM Channel : 7, programmed Period (us): 125000.00, actual : 125008, programmed DutyCycle : 55.00, actual : 54.97
+PWM Channel : 8, programmed Period (us): 111111.11, actual : 111122, programmed DutyCycle : 60.00, actual : 59.97
+PWM Channel : 9, programmed Period (us): 100000.00, actual : 100020, programmed DutyCycle : 65.00, actual : 64.96
+PWM Channel : 10, programmed Period (us): 66666.66, actual : 66652, programmed DutyCycle : 70.00, actual : 70.00
+PWM Channel : 11, programmed Period (us): 50000.00, actual : 50024, programmed DutyCycle : 75.00, actual : 74.90
+PWM Channel : 12, programmed Period (us): 40000.00, actual : 40028, programmed DutyCycle : 80.00, actual : 79.92
+PWM Channel : 13, programmed Period (us): 33333.33, actual : 33343, programmed DutyCycle : 85.00, actual : 84.90
+PWM Channel : 14, programmed Period (us): 25000.00, actual : 25001, programmed DutyCycle : 90.00, actual : 89.95
+PWM Channel : 15, programmed Period (us): 20000.00, actual : 20061, programmed DutyCycle : 95.00, actual : 94.81
 ```
 
 ---
@@ -895,26 +917,26 @@ The following is the sample terminal output when running example [**ISR_16_PWMs_
 
 ```
 Starting ISR_16_PWMs_Array on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.1.0
-[PWM] NRF52_MBED_TimerInterrupt: Timer = NRF_TIMER3
-[PWM] Frequency = 16000000.00 , _count = 320
-Starting ITimer OK, micros() = 3321014
-Channel : 0	Period : 1000000		OnTime : 50000	Start_Time : 3322305
-Channel : 1	Period : 500000		OnTime : 50000	Start_Time : 3322305
-Channel : 2	Period : 333333		OnTime : 66666	Start_Time : 3322305
-Channel : 3	Period : 250000		OnTime : 75000	Start_Time : 3322305
-Channel : 4	Period : 200000		OnTime : 80000	Start_Time : 3322305
-Channel : 5	Period : 166666		OnTime : 74999	Start_Time : 3322305
-Channel : 6	Period : 142857		OnTime : 71428	Start_Time : 3322305
-Channel : 7	Period : 125000		OnTime : 68750	Start_Time : 3322305
-Channel : 8	Period : 111111		OnTime : 66666	Start_Time : 3322305
-Channel : 9	Period : 100000		OnTime : 65000	Start_Time : 3322305
-Channel : 10	Period : 66666		OnTime : 46666	Start_Time : 3322305
-Channel : 11	Period : 50000		OnTime : 37500	Start_Time : 3322305
-Channel : 12	Period : 40000		OnTime : 32000	Start_Time : 3322305
-Channel : 13	Period : 33333		OnTime : 28333	Start_Time : 3322305
-Channel : 14	Period : 25000		OnTime : 22500	Start_Time : 3322305
-Channel : 15	Period : 20000		OnTime : 19000	Start_Time : 3322305
+NRF52_MBED_Slow_PWM v1.2.0
+[PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
+[PWM] Frequency =  100000.00 , _count =  160
+Starting ITimer OK, micros() = 2802084
+Channel : 0	    Period : 1000000		OnTime : 50000	Start_Time : 2804151
+Channel : 1	    Period : 500000		OnTime : 50000	Start_Time : 2807308
+Channel : 2	    Period : 333333		OnTime : 66666	Start_Time : 2810368
+Channel : 3	    Period : 250000		OnTime : 75000	Start_Time : 2813604
+Channel : 4	    Period : 200000		OnTime : 80000	Start_Time : 2816788
+Channel : 5	    Period : 166666		OnTime : 74999	Start_Time : 2820089
+Channel : 6	    Period : 142857		OnTime : 71428	Start_Time : 2823211
+Channel : 7	    Period : 125000		OnTime : 68750	Start_Time : 2826543
+Channel : 8	    Period : 111111		OnTime : 66666	Start_Time : 2829799
+Channel : 9	    Period : 100000		OnTime : 65000	Start_Time : 2833222
+Channel : 10	    Period : 66666		OnTime : 46666	Start_Time : 2836654
+Channel : 11	    Period : 50000		OnTime : 37500	Start_Time : 2839972
+Channel : 12	    Period : 40000		OnTime : 32000	Start_Time : 2843511
+Channel : 13	    Period : 33333		OnTime : 28333	Start_Time : 2846912
+Channel : 14	    Period : 25000		OnTime : 22500	Start_Time : 2850523
+Channel : 15	    Period : 20000		OnTime : 19000	Start_Time : 2853974
 ```
 
 ---
@@ -925,26 +947,26 @@ The following is the sample terminal output when running example [**ISR_16_PWMs_
 
 ```
 Starting ISR_16_PWMs_Array_Simple on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.1.0
-[PWM] NRF52_MBED_TimerInterrupt: Timer = NRF_TIMER3
-[PWM] Frequency = 16000000.00 , _count = 320
-Starting ITimer OK, micros() = 2781853
-Channel : 0	Period : 1000000		OnTime : 50000	Start_Time : 2783199
-Channel : 1	Period : 500000		OnTime : 50000	Start_Time : 2783199
-Channel : 2	Period : 333333		OnTime : 66666	Start_Time : 2783199
-Channel : 3	Period : 250000		OnTime : 75000	Start_Time : 2783199
-Channel : 4	Period : 200000		OnTime : 80000	Start_Time : 2783199
-Channel : 5	Period : 166666		OnTime : 74999	Start_Time : 2783199
-Channel : 6	Period : 142857		OnTime : 71428	Start_Time : 2783199
-Channel : 7	Period : 125000		OnTime : 68750	Start_Time : 2783199
-Channel : 8	Period : 111111		OnTime : 66666	Start_Time : 2783199
-Channel : 9	Period : 100000		OnTime : 65000	Start_Time : 2783199
-Channel : 10	Period : 66666		OnTime : 46666	Start_Time : 2783199
-Channel : 11	Period : 50000		OnTime : 37500	Start_Time : 2783199
-Channel : 12	Period : 40000		OnTime : 32000	Start_Time : 2783199
-Channel : 13	Period : 33333		OnTime : 28333	Start_Time : 2783199
-Channel : 14	Period : 25000		OnTime : 22500	Start_Time : 2783199
-Channel : 15	Period : 20000		OnTime : 19000	Start_Time : 2783199
+NRF52_MBED_Slow_PWM v1.2.0
+[PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
+[PWM] Frequency =  100000.00 , _count =  160
+Starting ITimer OK, micros() = 3202330
+Channel : 0	    Period : 1000000		OnTime : 50000	Start_Time : 3204240
+Channel : 1	    Period : 500000		OnTime : 50000	Start_Time : 3207337
+Channel : 2	    Period : 333333		OnTime : 66666	Start_Time : 3210465
+Channel : 3	    Period : 250000		OnTime : 75000	Start_Time : 3213666
+Channel : 4	    Period : 200000		OnTime : 80000	Start_Time : 3216872
+Channel : 5	    Period : 166666		OnTime : 74999	Start_Time : 3220014
+Channel : 6	    Period : 142857		OnTime : 71428	Start_Time : 3223261
+Channel : 7	    Period : 125000		OnTime : 68750	Start_Time : 3226495
+Channel : 8	    Period : 111111		OnTime : 66666	Start_Time : 3229851
+Channel : 9	    Period : 100000		OnTime : 65000	Start_Time : 3233165
+Channel : 10	    Period : 66666		OnTime : 46666	Start_Time : 3236525
+Channel : 11	    Period : 50000		OnTime : 37500	Start_Time : 3239882
+Channel : 12	    Period : 40000		OnTime : 32000	Start_Time : 3243149
+Channel : 13	    Period : 33333		OnTime : 28333	Start_Time : 3246655
+Channel : 14	    Period : 25000		OnTime : 22500	Start_Time : 3250177
+Channel : 15	    Period : 20000		OnTime : 19000	Start_Time : 3253635
 ```
 
 ---
@@ -955,15 +977,14 @@ The following is the sample terminal output when running example [ISR_Modify_PWM
 
 ```
 Starting ISR_Modify_PWM on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.1.0
-[PWM] NRF52_MBED_TimerInterrupt: Timer = NRF_TIMER3
-[PWM] Frequency = 16000000.00 , _count = 320
-Starting ITimer OK, micros() = 3622278
-Using PWM Freq = 1.00, PWM DutyCycle = 10
-Channel : 0	Period : 1000000		OnTime : 100000	Start_Time : 3624287
-Channel : 0	Period : 500000		OnTime : 450000	Start_Time : 13627805
-Channel : 0	Period : 1000000		OnTime : 100000	Start_Time : 23628976
-Channel : 0	Period : 500000		OnTime : 450000	Start_Time : 33630621
+NRF52_MBED_Slow_PWM v1.2.0
+[PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
+[PWM] Frequency =  50000.00 , _count =  320
+Starting ITimer OK, micros() = 2703294
+Using PWM Freq = 1.00, PWM DutyCycle = 50.00
+Channel : 0	    Period : 1000000		OnTime : 500000	Start_Time : 2705932
+Channel : 0	New Period : 500000		OnTime : 450000	Start_Time : 12706044
+Channel : 0	New Period : 1000000		OnTime : 500000	Start_Time : 22706410
 ```
 
 ---
@@ -974,16 +995,16 @@ The following is the sample terminal output when running example [ISR_Changing_P
 
 ```
 Starting ISR_Changing_PWM on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.1.0
-[PWM] NRF52_MBED_TimerInterrupt: Timer = NRF_TIMER3
-[PWM] Frequency = 16000000.00 , _count = 320
-Starting ITimer OK, micros() = 3219039
-Using PWM Freq = 1.00, PWM DutyCycle = 50
-Channel : 0	Period : 1000000		OnTime : 500000	Start_Time : 3220922
-Using PWM Freq = 2.00, PWM DutyCycle = 90
-Channel : 0	Period : 500000		OnTime : 450000	Start_Time : 13223831
-Using PWM Freq = 1.00, PWM DutyCycle = 50
-Channel : 0	Period : 1000000		OnTime : 500000	Start_Time : 23230788
+NRF52_MBED_Slow_PWM v1.2.0
+[PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
+[PWM] Frequency =  50000.00 , _count =  320
+Starting ITimer OK, micros() = 3024808
+Using PWM Freq = 1.00, PWM DutyCycle = 50.00
+Channel : 0	    Period : 1000000		OnTime : 500000	Start_Time : 3027194
+Using PWM Freq = 2.00, PWM DutyCycle = 90.00
+Channel : 0	    Period : 500000		OnTime : 450000	Start_Time : 13035894
+Using PWM Freq = 1.00, PWM DutyCycle = 50.00
+Channel : 0	    Period : 1000000		OnTime : 500000	Start_Time : 23048753
 ```
 
 ---
@@ -1030,6 +1051,11 @@ Submit issues to: [nRF52_MBED_Slow_PWM issues](https://github.com/khoih-prog/nRF
 1. Basic hardware multi-channel PWM for **nRF52_MBED-based Nano-33-BLE or Nano-33-BLE_Sense, etc.** using [`Arduino mbed_nano core 2.5.2+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2)
 2. Add Table of Contents
 3. Add functions to modify PWM settings on-the-fly
+4. Fix `multiple-definitions` linker error
+5. Optimize library code by using `reference-passing` instead of `value-passing`
+6. Add support to [`MegaCoreX megaAVR core`](https://github.com/MCUdude/MegaCoreX) core, including ATmega4809, ATmega4808, ATmega3209, ATmega3208, ATmega1609, ATmega1608, ATmega809 and ATmega808
+7. Improve accuracy by using `float`, instead of `uint32_t` for `dutycycle`
+8. DutyCycle to be optionally updated at the end current PWM period instead of immediately.
 
 ---
 ---
