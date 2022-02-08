@@ -1054,9 +1054,8 @@ Submit issues to: [nRF52_MBED_Slow_PWM issues](https://github.com/khoih-prog/nRF
 3. Add functions to modify PWM settings on-the-fly
 4. Fix `multiple-definitions` linker error
 5. Optimize library code by using `reference-passing` instead of `value-passing`
-6. Add support to [`MegaCoreX megaAVR core`](https://github.com/MCUdude/MegaCoreX) core, including ATmega4809, ATmega4808, ATmega3209, ATmega3208, ATmega1609, ATmega1608, ATmega809 and ATmega808
-7. Improve accuracy by using `float`, instead of `uint32_t` for `dutycycle`
-8. DutyCycle to be optionally updated at the end current PWM period instead of immediately.
+6. Improve accuracy by using `float`, instead of `uint32_t` for `dutycycle`
+7. DutyCycle to be optionally updated at the end current PWM period instead of immediately.
 
 ---
 ---
