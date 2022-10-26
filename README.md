@@ -123,7 +123,8 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ### Currently supported Boards
 
-1. **nRF52_MBED-based boards** such as Nano-33-BLE or Nano-33-BLE_Sense, etc., using [`Arduino mbed_nano core 2.5.2+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2)
+1. **MBED nRF52840-based boards such as Nano_33_BLE, Nano_33_BLE_Sense**, etc. using [**Arduino-mbed mbed_nano** core](https://github.com/arduino/ArduinoCore-mbed)
+2. **Seeeduino nRF52840-based boards such as SEEED_XIAO_NRF52840 and SEEED_XIAO_NRF52840_SENSE**, etc. using Seeeduino `mbed` core
 
 ---
 
@@ -139,10 +140,11 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ## Prerequisites
 
  1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
- 2. [`Arduino mbed_nano core 2.7.2+`](https://github.com/arduino/ArduinoCore-mbed) for NRF52-based board using mbed-RTOS such as Nano-33-BLE if you don't use `NRF_TIMER_1`. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
+ 2. [`Arduino mbed_nano core 3.4.1+`](https://github.com/arduino/ArduinoCore-mbed) for NRF52-based board using mbed-RTOS such as Nano-33-BLE if you don't use `NRF_TIMER_1`. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
  3. [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2) for NRF52-based board using mbed-RTOS such as Nano-33-BLE if you'd like to use `NRF_TIMER_1`. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
+ 4. `Seeeduino mbed core 2.7.2+` for Seeeduino nRF52840-based boards such as **SEEED_XIAO_NRF52840 and SEEED_XIAO_NRF52840_SENSE**
  
- 4. To use with certain example
+ 5. To use with certain example
    - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_16_PWMs_Array_Complex example](examples/ISR_16_PWMs_Array_Complex).
 ---
 ---
@@ -159,9 +161,9 @@ You can also use this link [![arduino-library-badge](https://www.ardu-badge.com/
 Another way to install is to:
 
 1. Navigate to [**nRF52_MBED_Slow_PWM**](https://github.com/khoih-prog/nRF52_MBED_Slow_PWM) page.
-2. Download the latest release `nRF52_MBED_Slow_PWM-master.zip`.
-3. Extract the zip file to `nRF52_MBED_Slow_PWM-master` directory 
-4. Copy whole `nRF52_MBED_Slow_PWM-master` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
+2. Download the latest release `nRF52_MBED_Slow_PWM-main.zip`.
+3. Extract the zip file to `nRF52_MBED_Slow_PWM-main` directory 
+4. Copy whole `nRF52_MBED_Slow_PWM-main` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
 
 ### VS Code & PlatformIO
 
@@ -180,14 +182,14 @@ The current library implementation, using `xyz-Impl.h` instead of standard `xyz.
 
 You can include this `.hpp` file
 
-```
+```cpp
 // Can be included as many times as necessary, without `Multiple Definitions` Linker Error
 #include "nRF52_MBED_Slow_PWM.hpp"    //https://github.com/khoih-prog/nRF52_MBED_Slow_PWM
 ```
 
 in many files. But be sure to use the following `.h` file **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-```
+```cpp
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "nRF52_MBED_Slow_PWM.h"      //https://github.com/khoih-prog/nRF52_MBED_Slow_PWM
 ```
@@ -211,7 +213,7 @@ Before using any Timer, you have to make sure the Timer has not been used by any
 
 #### 1. Init Hardware Timer
 
-```
+```cpp
 // Init NRF52 timer NRF_TIMER3
 NRF52_MBED_Timer ITimer(NRF_TIMER_3);
 
@@ -221,7 +223,7 @@ NRF52_MBED_Slow_PWM ISR_PWM;
 
 #### 2. Set PWM Frequency, dutycycle, attach irqCallbackStartFunc and irqCallbackStopFunc functions
 
-```
+```cpp
 void irqCallbackStartFunc()
 {
 
@@ -261,7 +263,7 @@ void setup()
 
 ### Example [ISR_16_PWMs_Array_Complex](examples/ISR_16_PWMs_Array_Complex)
 
-https://github.com/khoih-prog/nRF52_MBED_Slow_PWM/blob/36036c9759ff4ea96a4b30e33242ca54ed49a7c4/examples/ISR_16_PWMs_Array_Complex/ISR_16_PWMs_Array_Complex.ino#L16-L578
+https://github.com/khoih-prog/nRF52_MBED_Slow_PWM/blob/d99a6b40d4cd4642284791634d76ea729fe6d91b/examples/ISR_16_PWMs_Array_Complex/ISR_16_PWMs_Array_Complex.ino#L16-L590
 
 
 ---
@@ -276,7 +278,7 @@ The following is the sample terminal output when running example [ISR_16_PWMs_Ar
 
 ```
 Starting ISR_16_PWMs_Array_Complex on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.2.1
+NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
 [PWM] Frequency =  100000.00 , _count =  160
 Starting ITimer OK, micros() = 2800208
@@ -357,7 +359,7 @@ The following is the sample terminal output when running example [**ISR_16_PWMs_
 
 ```
 Starting ISR_16_PWMs_Array on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.2.1
+NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
 [PWM] Frequency =  100000.00 , _count =  160
 Starting ITimer OK, micros() = 2802084
@@ -387,7 +389,7 @@ The following is the sample terminal output when running example [**ISR_16_PWMs_
 
 ```
 Starting ISR_16_PWMs_Array_Simple on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.2.1
+NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
 [PWM] Frequency =  100000.00 , _count =  160
 Starting ITimer OK, micros() = 3202330
@@ -417,7 +419,7 @@ The following is the sample terminal output when running example [ISR_Modify_PWM
 
 ```
 Starting ISR_Modify_PWM on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.2.1
+NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
 [PWM] Frequency =  50000.00 , _count =  320
 Starting ITimer OK, micros() = 2703294
@@ -456,7 +458,7 @@ The following is the sample terminal output when running example [ISR_Changing_P
 
 ```
 Starting ISR_Changing_PWM on Nano 33 BLE
-NRF52_MBED_Slow_PWM v1.2.1
+NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
 [PWM] Frequency =  50000.00 , _count =  320
 Starting ITimer OK, micros() = 3024808
@@ -509,14 +511,17 @@ Submit issues to: [nRF52_MBED_Slow_PWM issues](https://github.com/khoih-prog/nRF
 
 ## DONE
 
-1. Basic hardware multi-channel PWM for **nRF52_MBED-based Nano-33-BLE or Nano-33-BLE_Sense, etc.** using [`Arduino mbed_nano core 2.5.2+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2)
-2. Add Table of Contents
-3. Add functions to modify PWM settings on-the-fly
-4. Fix `multiple-definitions` linker error
-5. Optimize library code by using `reference-passing` instead of `value-passing`
-6. Improve accuracy by using `float`, instead of `uint32_t` for `dutycycle`
-7. DutyCycle to be optionally updated at the end current PWM period instead of immediately.
-8. Display informational warning only when `_PWM_LOGLEVEL_` > 3
+ 1. Basic hardware multi-channel PWM for **nRF52_MBED-based Nano-33-BLE or Nano-33-BLE_Sense, etc.** using [`Arduino mbed_nano core 2.5.2+`](https://github.com/arduino/ArduinoCore-mbed) or [`Arduino mbed core v1.3.2-`](https://github.com/arduino/ArduinoCore-mbed/releases/tag/1.3.2)
+ 2. Add Table of Contents
+ 3. Add functions to modify PWM settings on-the-fly
+ 4. Fix `multiple-definitions` linker error
+ 5. Optimize library code by using `reference-passing` instead of `value-passing`
+ 6. Improve accuracy by using `float`, instead of `uint32_t` for `dutycycle`
+ 7. DutyCycle to be optionally updated at the end current PWM period instead of immediately.
+ 8. Display informational warning only when `_PWM_LOGLEVEL_` > 3
+ 9. Add support to Seeeduino nRF52840-based boards such as **SEEED_XIAO_NRF52840 and SEEED_XIAO_NRF52840_SENSE**, etc. using Seeeduino `mbed` core
+10. Add astyle using `allman` style. Restyle the library
+
 
 ---
 ---
