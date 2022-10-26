@@ -58,7 +58,7 @@ NRF52_MBED_Slow_PWM ISR_PWM;
 //////////////////////////////////////////////////////
 
 void TimerHandler()
-{ 
+{
   ISR_PWM.run();
 }
 
@@ -94,7 +94,8 @@ int channelNum;
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial);
+
+  while (!Serial && millis() < 5000);
 
   delay(2000);
 
@@ -105,7 +106,8 @@ void setup()
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_US, TimerHandler))
   {
     startMicros = micros();
-    Serial.print(F("Starting ITimer OK, micros() = ")); Serial.println(startMicros);
+    Serial.print(F("Starting ITimer OK, micros() = "));
+    Serial.println(startMicros);
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));
@@ -114,7 +116,10 @@ void setup()
   // You can use up to 16 timer for each ISR_PWM
   //void setPWM(uint32_t pin, uint32_t frequency, uint32_t dutycycle
   // , timer_callback_p StartCallback = nullptr, timer_callback_p StopCallback = nullptr)
-  Serial.print(F("Using PWM Freq = ")); Serial.print(PWM_Freq1); Serial.print(F(", PWM DutyCycle = ")); Serial.println(PWM_DutyCycle1);
+  Serial.print(F("Using PWM Freq = "));
+  Serial.print(PWM_Freq1);
+  Serial.print(F(", PWM DutyCycle = "));
+  Serial.println(PWM_DutyCycle1);
 
 #if USING_PWM_FREQUENCY
 

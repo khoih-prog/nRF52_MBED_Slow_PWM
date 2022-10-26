@@ -1,6 +1,6 @@
 /****************************************************************************************************************************
   multiFileProject.cpp
-  
+
   For nRF52-based boards using Arduino mbed_nano core, such as Nano_33_BLE
   Written by Khoi Hoang
 

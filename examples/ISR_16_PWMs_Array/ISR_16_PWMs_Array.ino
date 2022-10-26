@@ -58,7 +58,7 @@ NRF52_MBED_Slow_PWM ISR_PWM;
 //////////////////////////////////////////////////////
 
 void TimerHandler()
-{ 
+{
   ISR_PWM.run();
 }
 
@@ -89,15 +89,15 @@ void TimerHandler()
 // You can assign pins here. Be carefull to select good pin to use or crash, e.g pin 6-11
 uint32_t PWM_Pin[] =
 {
-   LED_BUILTIN, LED_BLUE, LED_RED, PIN_D0, PIN_D1,  PIN_D2,  PIN_D3,  PIN_D4,
-        PIN_D5,   PIN_D6,  PIN_D7, PIN_D8, PIN_D9, PIN_D10, PIN_D11, PIN_D12
+  LED_BUILTIN, LED_BLUE, LED_RED, PIN_D0, PIN_D1,  PIN_D2,  PIN_D3,  PIN_D4,
+  PIN_D5,   PIN_D6,  PIN_D7, PIN_D8, PIN_D9, PIN_D10, PIN_D11, PIN_D12
 };
 
 // You can assign any interval for any timer here, in microseconds
 uint32_t PWM_Period[] =
 {
   1000000L,   500000L,   333333L,   250000L,   200000L,   166667L,   142857L,   125000L,
-   111111L,   100000L,    66667L,    50000L,    40000L,   33333L,     25000L,    20000L
+  111111L,   100000L,    66667L,    50000L,    40000L,   33333L,     25000L,    20000L
 };
 
 // You can assign any interval for any timer here, in Hz
@@ -110,7 +110,7 @@ float PWM_Freq[] =
 // You can assign any interval for any timer here, in milliseconds
 float PWM_DutyCycle[] =
 {
-   5.0, 10.0, 20.0, 30.0, 40.0, 45.0, 50.0, 55.0,
+  5.0, 10.0, 20.0, 30.0, 40.0, 45.0, 50.0, 55.0,
   60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0
 };
 
@@ -186,8 +186,8 @@ void doingSomething15()
 
 irqCallback irqCallbackStartFunc[] =
 {
-  doingSomething0,  doingSomething1,  doingSomething2,  doingSomething3, 
-  doingSomething4,  doingSomething5,  doingSomething6,  doingSomething7, 
+  doingSomething0,  doingSomething1,  doingSomething2,  doingSomething3,
+  doingSomething4,  doingSomething5,  doingSomething6,  doingSomething7,
   doingSomething8,  doingSomething9,  doingSomething10, doingSomething11,
   doingSomething12, doingSomething13, doingSomething14, doingSomething15
 };
@@ -195,9 +195,10 @@ irqCallback irqCallbackStartFunc[] =
 ////////////////////////////////////////////////
 
 void setup()
-{ 
+{
   Serial.begin(115200);
-  while (!Serial);
+
+  while (!Serial && millis() < 5000);
 
   delay(2000);
 
@@ -208,7 +209,8 @@ void setup()
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_US, TimerHandler))
   {
     startMicros = micros();
-    Serial.print(F("Starting ITimer OK, micros() = ")); Serial.println(startMicros);
+    Serial.print(F("Starting ITimer OK, micros() = "));
+    Serial.println(startMicros);
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));
@@ -226,13 +228,13 @@ void setup()
     ISR_PWM.setPWM(PWM_Pin[i], PWM_Freq[i], PWM_DutyCycle[i], irqCallbackStartFunc[i]);
 
 #else
-  #if USING_MICROS_RESOLUTION
+#if USING_MICROS_RESOLUTION
     // Or using period in microsecs resolution
     ISR_PWM.setPWM_Period(PWM_Pin[i], PWM_Period[i], PWM_DutyCycle[i], irqCallbackStartFunc[i]);
-  #else
+#else
     // Or using period in millisecs resolution
     ISR_PWM.setPWM_Period(PWM_Pin[i], PWM_Period[i] / 1000, PWM_DutyCycle[i], irqCallbackStartFunc[i]);
-  #endif
+#endif
 #endif
   }
 }

@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.2.1
+  Version: 1.2.2
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -20,6 +20,7 @@
   1.1.0   K Hoang      10/11/2021 Add functions to modify PWM settings on-the-fly
   1.2.0   K.Hoang      07/02/2022 Fix `multiple-definitions` linker error. Improve accuracy. Optimize code. Fix bug
   1.2.1   K Hoang      03/03/2022 Fix `DutyCycle` and `New Period` display bugs. Display warning only when debug level > 3
+  1.2.2   K Hoang      26/10/2022 Add support to SEEED_XIAO_NRF52840 and SEEED_XIAO_NRF52840_SENSE using mbed
 *****************************************************************************************************************************/
 
 #pragma once
@@ -32,13 +33,13 @@
 #endif
 
 #ifndef NRF52_MBED_SLOW_PWM_VERSION
-  #define NRF52_MBED_SLOW_PWM_VERSION           "NRF52_MBED_Slow_PWM v1.2.1"
+  #define NRF52_MBED_SLOW_PWM_VERSION           "NRF52_MBED_Slow_PWM v1.2.2"
   
   #define NRF52_MBED_SLOW_PWM_VERSION_MAJOR      1
   #define NRF52_MBED_SLOW_PWM_VERSION_MINOR      2
-  #define NRF52_MBED_SLOW_PWM_VERSION_PATCH      1
+  #define NRF52_MBED_SLOW_PWM_VERSION_PATCH      2
 
-  #define NRF52_MBED_SLOW_PWM_VERSION_INT        1002001
+  #define NRF52_MBED_SLOW_PWM_VERSION_INT        1002002
 #endif
 
 #ifndef _PWM_LOGLEVEL_
