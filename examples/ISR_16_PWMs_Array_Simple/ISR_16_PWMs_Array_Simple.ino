@@ -125,7 +125,8 @@ void setup()
 
   delay(2000);
 
-  Serial.print(F("\nStarting ISR_16_PWMs_Array_Simple on ")); Serial.println(BOARD_NAME);
+  Serial.print(F("\nStarting ISR_16_PWMs_Array_Simple on "));
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_MBED_SLOW_PWM_VERSION);
 
   // Interval in microsecs

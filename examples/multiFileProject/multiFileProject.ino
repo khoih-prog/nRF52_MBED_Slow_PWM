@@ -28,7 +28,8 @@ void setup()
 
   while (!Serial && millis() < 5000);
 
-  Serial.println("\nStart multiFileProject on "); Serial.println(BOARD_NAME);
+  Serial.println("\nStart multiFileProject on ");
+  Serial.println(BOARD_NAME);
   Serial.println(NRF52_MBED_SLOW_PWM_VERSION);
 
 #if defined(NRF52_MBED_SLOW_PWM_VERSION_MIN)

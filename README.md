@@ -6,8 +6,12 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/nRF52_MBED_Slow_PWM.svg)](http://github.com/khoih-prog/nRF52_MBED_Slow_PWM/issues)
 
+
+
 <a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
 <a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
+<a href="https://profile-counter.glitch.me/khoih-prog/count.svg" title="Total khoih-prog Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog/count.svg" style="height: 30px;width: 200px;"></a>
+<a href="https://profile-counter.glitch.me/khoih-prog-nRF52_MBED_Slow_PWM/count.svg" title="nRF52_MBED_Slow_PWM Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog-nRF52_MBED_Slow_PWM/count.svg" style="height: 30px;width: 200px;"></a>
 
 ---
 ---
@@ -66,7 +70,7 @@ As more complex calculation and check **inside ISR** are introduced from v1.2.0,
 You can modify to use larger `HW_TIMER_INTERVAL_US`, (from current 10uS), according to your board and use-case if crash happens.
 
 
-```
+```cpp
 // Don't change these numbers to make higher Timer freq. System can hang
 #define HW_TIMER_INTERVAL_US      10L
 ```
@@ -276,7 +280,7 @@ https://github.com/khoih-prog/nRF52_MBED_Slow_PWM/blob/d99a6b40d4cd4642284791634
 The following is the sample terminal output when running example [ISR_16_PWMs_Array_Complex](examples/ISR_16_PWMs_Array_Complex) to demonstrate how to use multiple PWM channels with complex callback functions, the accuracy of ISR Hardware PWM-channels, **especially when system is very busy**.  The ISR PWM-channels is **running exactly according to corresponding programmed periods and duty-cycles**
 
 
-```
+```cpp
 Starting ISR_16_PWMs_Array_Complex on Nano 33 BLE
 NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
@@ -357,7 +361,7 @@ PWM Channel : 15, programmed Period (us): 20000.00, actual : 20061, programmed D
 
 The following is the sample terminal output when running example [**ISR_16_PWMs_Array**](examples/ISR_16_PWMs_Array) on **nRF52_MBED-based Nano 33 BLE** to demonstrate how to use multiple PWM channels with simple callback functions.
 
-```
+```cpp
 Starting ISR_16_PWMs_Array on Nano 33 BLE
 NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
@@ -387,7 +391,7 @@ Channel : 15	    Period : 20000		OnTime : 19000	Start_Time : 2853974
 
 The following is the sample terminal output when running example [**ISR_16_PWMs_Array_Simple**](examples/ISR_16_PWMs_Array_Simple) on **nRF52_MBED-based Nano 33 BLE** to demonstrate how to use multiple PWM channels.
 
-```
+```cpp
 Starting ISR_16_PWMs_Array_Simple on Nano 33 BLE
 NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
@@ -417,7 +421,7 @@ Channel : 15	    Period : 20000		OnTime : 19000	Start_Time : 3253635
 
 The following is the sample terminal output when running example [ISR_Modify_PWM](examples/ISR_Modify_PWM) on **nRF52_MBED-based Nano 33 BLE** to demonstrate how to modify PWM settings on-the-fly without deleting the PWM channel
 
-```
+```cpp
 Starting ISR_Modify_PWM on Nano 33 BLE
 NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
@@ -456,7 +460,7 @@ Channel : 0	    Period : 10000		OnTime : 555	Start_Time : 233333984
 
 The following is the sample terminal output when running example [ISR_Changing_PWM](examples/ISR_Changing_PWM) on **nRF52_MBED-based Nano 33 BLE** to demonstrate how to modify PWM settings on-the-fly by deleting the PWM channel and reinit the PWM channel
 
-```
+```cpp
 Starting ISR_Changing_PWM on Nano 33 BLE
 NRF52_MBED_Slow_PWM v1.2.2
 [PWM] Timer =  NRF_TIMER3 , Timer Clock (Hz) =  16000000.00
@@ -551,6 +555,6 @@ If you want to contribute to this project:
 
 ## Copyright
 
-Copyright 2021- Khoi Hoang
+Copyright (c) 2021- Khoi Hoang
 
 
